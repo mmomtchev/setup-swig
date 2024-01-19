@@ -118,7 +118,7 @@ function run() {
                     return [4 /*yield*/, tc.downloadTool(tag.tarball_url)];
                 case 6:
                     swigArchive = _c.sent();
-                    return [4 /*yield*/, tc.extractTar(swigArchive, target, ['--strip-components=1'])];
+                    return [4 /*yield*/, tc.extractTar(swigArchive, target, ['-zx', '--strip-components=1'])];
                 case 7:
                     swigRoot = _c.sent();
                     return [4 /*yield*/, exec.exec('sh', ['autogen.sh'], { cwd: swigRoot })];

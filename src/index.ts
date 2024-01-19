@@ -54,7 +54,7 @@ async function run() {
     core.info(`Installing SWIG${branch !== 'main' ? `-${branch}` : ''} ${tag.name} in ${target}`);
 
     const swigArchive = await tc.downloadTool(tag.tarball_url);
-    const swigRoot = await tc.extractTar(swigArchive, target, ['--strip-components=1']);
+    const swigRoot = await tc.extractTar(swigArchive, target, ['-zx', '--strip-components=1']);
 
     await exec.exec('sh', ['autogen.sh'], { cwd: swigRoot });
     await exec.exec('sh', ['configure'], { cwd: swigRoot });
