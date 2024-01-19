@@ -8,7 +8,7 @@ jobs:
       matrix:
         os: [ubuntu-latest]
     steps:
-    - uses: mmomtchev/setup-swig@cache
+    - uses: mmomtchev/setup-swig@main
 
     - name: Verify
       run: swig -version
@@ -19,7 +19,7 @@ jobs:
       matrix:
         os: [ubuntu-latest]
     steps:
-    - uses: mmomtchev/setup-swig@cache
+    - uses: mmomtchev/setup-swig@main
       with:
         version: v4.1.0
 
@@ -33,7 +33,7 @@ jobs:
       matrix:
         os: [ubuntu-latest]
     steps:
-    - uses: mmomtchev/setup-swig@cache
+    - uses: mmomtchev/setup-swig@main
       with:
         branch: jse
 
