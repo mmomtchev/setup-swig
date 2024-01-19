@@ -10,7 +10,7 @@ const repos = {
   jse: { owner: 'mmomtchev', repo: 'swig' }
 };
 
-const octokit = new Octokit({auth: process.env.GITHUB_TOKEN});
+const octokit = new Octokit({ auth: process.env.GITHUB_TOKEN });
 
 async function run() {
   try {
@@ -37,14 +37,15 @@ async function run() {
           repo: repos[branch].repo,
           headers: {
             'X-GitHub-Api-Version': '2022-11-28'
-          }})).data.commit.author.date);
+          }
+        })).data.commit.author.date);
         return ({
           name: t.name,
           tarball_url: t.tarball_url,
           date
         });
       }))
-      .then((tags) => tags.sort((a, b) => a.date.getTime() - b.date.getTime()).reverse()));
+        .then((tags) => tags.sort((a, b) => a.date.getTime() - b.date.getTime()).reverse()));
 
     const tag = version === 'latest' ? tags[0] : tags.find((t) => t.name === version);
     if (!tag) throw new Error('Invalid version');
@@ -55,12 +56,14 @@ async function run() {
     const swigArchive = await tc.downloadTool(tag.tarball_url);
     const swigRoot = await tc.extractTar(swigArchive, target);
 
-    await exec.exec(`cd swig/swig-${version} && sh autogen.sh && ./configure && make`);
+    await exec.exec('sh', ['autogen.sh'], { cwd: swigRoot });
+    await exec.exec('sh', ['configure'], { cwd: swigRoot });
+    await exec.exec('make', [], { cwd: swigRoot });
 
     core.exportVariable('SWIG_LIB', path.resolve(swigRoot, 'Lib'));
-    core.exportVariable('PATH', process.env.PATH + ':' + swigRoot)
+    core.exportVariable('PATH', process.env.PATH + ':' + swigRoot);
   } catch (error) {
-    if (error && 
+    if (error &&
       typeof error === 'object' &&
       'message' in error &&
       (

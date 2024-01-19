@@ -54,7 +54,7 @@ function run() {
         return __generator(this, function (_c) {
             switch (_c.label) {
                 case 0:
-                    _c.trys.push([0, 9, , 10]);
+                    _c.trys.push([0, 11, , 12]);
                     if (os.platform() !== 'linux') {
                         throw new Error('Only Linux runners are supported at the moment');
                     }
@@ -121,13 +121,19 @@ function run() {
                     return [4 /*yield*/, tc.extractTar(swigArchive, target)];
                 case 7:
                     swigRoot = _c.sent();
-                    return [4 /*yield*/, exec.exec("cd swig/swig-".concat(version_1, " && sh autogen.sh && ./configure && make"))];
+                    return [4 /*yield*/, exec.exec('sh', ['autogen.sh'], { cwd: swigRoot })];
                 case 8:
+                    _c.sent();
+                    return [4 /*yield*/, exec.exec('sh', ['configure'], { cwd: swigRoot })];
+                case 9:
+                    _c.sent();
+                    return [4 /*yield*/, exec.exec('make', [], { cwd: swigRoot })];
+                case 10:
                     _c.sent();
                     core.exportVariable('SWIG_LIB', path.resolve(swigRoot, 'Lib'));
                     core.exportVariable('PATH', process.env.PATH + ':' + swigRoot);
-                    return [3 /*break*/, 10];
-                case 9:
+                    return [3 /*break*/, 12];
+                case 11:
                     error_1 = _c.sent();
                     if (error_1 &&
                         typeof error_1 === 'object' &&
@@ -136,8 +142,8 @@ function run() {
                             error_1.message instanceof Error)) {
                         core.setFailed(error_1.message);
                     }
-                    return [3 /*break*/, 10];
-                case 10: return [2 /*return*/];
+                    return [3 /*break*/, 12];
+                case 12: return [2 /*return*/];
             }
         });
     });
