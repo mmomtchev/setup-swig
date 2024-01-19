@@ -113,6 +113,7 @@ function run() {
                     tag = version_1 === 'latest' ? tags[0] : tags.find(function (t) { return t.name === version_1; });
                     if (!tag)
                         throw new Error('Invalid version');
+                    core.info("Downloading from ".concat(tag.tarball_url));
                     target = path.join(process.env.GITHUB_WORKSPACE, 'swig');
                     core.info("Installing SWIG".concat(branch_1 !== 'main' ? "-".concat(branch_1) : '', " ").concat(tag.name, " in ").concat(target));
                     return [4 /*yield*/, tc.downloadTool(tag.tarball_url)];

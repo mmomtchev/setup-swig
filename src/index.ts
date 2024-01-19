@@ -49,6 +49,7 @@ async function run() {
 
     const tag = version === 'latest' ? tags[0] : tags.find((t) => t.name === version);
     if (!tag) throw new Error('Invalid version');
+    core.info(`Downloading from ${tag.tarball_url}`);
 
     const target = path.join(process.env.GITHUB_WORKSPACE!, 'swig');
     core.info(`Installing SWIG${branch !== 'main' ? `-${branch}` : ''} ${tag.name} in ${target}`);
