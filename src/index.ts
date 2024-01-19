@@ -53,7 +53,7 @@ async function run() {
     const tag = version === 'latest' ? tags[0] : tags.find((t) => t.name === version);
     if (!tag) throw new Error('Invalid version');
 
-    const swigRoot = path.join(process.env.GITHUB_WORKSPACE!, 'swig');
+    const swigRoot = path.join(process.env.GITHUB_ACTION_PATH!, await core.getInput('actions-cache-folder'), 'swig');
 
     let cached = false;
     const cacheKey = `swig-${branch}-${tag.name}-${os.platform()}-${os.arch()}-${os.release()}`;
