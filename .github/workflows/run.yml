@@ -21,7 +21,7 @@ jobs:
     steps:
     - uses: mmomtchev/setup-swig@first-run
       with:
-        version: 4.1.0
+        version: v4.1.0
 
     - name: Verify
       run: swig-jse -version

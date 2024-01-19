@@ -61,7 +61,7 @@ async function run() {
     await exec.exec('sh', ['configure'], { cwd: swigRoot });
     await exec.exec('make', [], { cwd: swigRoot });
 
-    await exec.exec('ln', ['-s', 'swig', `swig-${branch}`])
+    await exec.exec('ln', ['-s', 'swig', `swig-${branch}`], { cwd: swigRoot });
 
     core.exportVariable('SWIG_LIB', path.resolve(swigRoot, 'Lib'));
     core.exportVariable('PATH', swigRoot + ':' + process.env.PATH);

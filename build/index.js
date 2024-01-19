@@ -131,7 +131,7 @@ function run() {
                     return [4 /*yield*/, exec.exec('make', [], { cwd: swigRoot })];
                 case 10:
                     _c.sent();
-                    return [4 /*yield*/, exec.exec('ln', ['-s', 'swig', "swig-".concat(branch_1)])];
+                    return [4 /*yield*/, exec.exec('ln', ['-s', 'swig', "swig-".concat(branch_1)], { cwd: swigRoot })];
                 case 11:
                     _c.sent();
                     core.exportVariable('SWIG_LIB', path.resolve(swigRoot, 'Lib'));
