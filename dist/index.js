@@ -81,6 +81,8 @@ function run() {
                         }).then(function (tags) { return tags.data.sort(function (a, b) { return a.name.localeCompare(b.name); }).reverse(); })];
                 case 3:
                     tags = _a.sent();
+                    console.log(tags);
+                    console.log(version_1);
                     tag = version_1 === 'last' ? tags[0] : tags.find(function (t) { return t.name === version_1; });
                     if (!tag)
                         throw new Error('Invalid version');
