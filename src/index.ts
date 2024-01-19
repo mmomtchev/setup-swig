@@ -1,9 +1,11 @@
 import * as core from '@actions/core';
 import * as exec from '@actions/exec';
 import * as tc from '@actions/tool-cache';
+import * as cache from '@actions/cache';
 import { Octokit } from '@octokit/core';
 import * as os from 'os';
 import * as path from 'path';
+import * as fs from 'fs';
 
 const repos = {
   main: { owner: 'swig', repo: 'swig' },
@@ -20,6 +22,7 @@ async function run() {
 
     const version = process.env.SETUP_SWIG_VERSION || await core.getInput('version');
     const branch = process.env.SETUP_SWIG_BRANCH || await core.getInput('branch');
+    const shouldCache = await core.getInput('cache');
 
     if (!repos[branch]) throw new Error('Invalid branch');
 
@@ -49,19 +52,44 @@ async function run() {
 
     const tag = version === 'latest' ? tags[0] : tags.find((t) => t.name === version);
     if (!tag) throw new Error('Invalid version');
-    core.info(`Downloading from ${tag.tarball_url}`);
 
-    const target = path.join(process.env.GITHUB_WORKSPACE!, 'swig');
-    core.info(`Installing SWIG${branch !== 'main' ? `-${branch}` : ''} ${tag.name} in ${target}`);
+    const swigRoot = path.join(process.env.GITHUB_WORKSPACE!, 'swig');
 
-    const swigArchive = await tc.downloadTool(tag.tarball_url);
-    const swigRoot = await tc.extractTar(swigArchive, target, ['-zx', '--strip-components=1']);
+    let cached = false;
+    const cacheKey = `swig-${branch}-${tag.name}-${os.platform()}-${os.arch()}-${os.release()}`;
+    if (shouldCache) {
+      try {
+        try {
+          fs.accessSync(swigRoot, fs.constants.X_OK);
+        } catch {
+          await cache.restoreCache([swigRoot], cacheKey);
+        }
+        fs.accessSync(swigRoot, fs.constants.X_OK);
+        core.info(`Found cached instance ${cacheKey}`);
+        cached = true;
+      } catch {
+        core.info('Rebuilding from source');
+      }
+    }
 
-    await exec.exec('sh', ['autogen.sh'], { cwd: swigRoot });
-    await exec.exec('sh', ['configure'], { cwd: swigRoot });
-    await exec.exec('make', [], { cwd: swigRoot });
+    if (!cached) {
+      core.info(`Downloading from ${tag.tarball_url}`);
+      core.info(`Installing SWIG${branch !== 'main' ? `-${branch}` : ''} ${tag.name} in ${swigRoot}`);
 
-    await exec.exec('ln', ['-s', 'swig', `swig-${branch}`], { cwd: swigRoot });
+      const swigArchive = await tc.downloadTool(tag.tarball_url);
+      await tc.extractTar(swigArchive, swigRoot, ['-zx', '--strip-components=1']);
+
+      await exec.exec('sh', ['autogen.sh'], { cwd: swigRoot });
+      await exec.exec('sh', ['configure'], { cwd: swigRoot });
+      await exec.exec('make', [], { cwd: swigRoot });
+
+      await exec.exec('ln', ['-s', 'swig', `swig-${branch}`], { cwd: swigRoot });
+
+      if (shouldCache) {
+        await cache.saveCache([swigRoot], cacheKey);
+        core.info(`Saved to cache ${cacheKey}`);
+      }
+    }
 
     core.exportVariable('SWIG_LIB', path.resolve(swigRoot, 'Lib'));
     core.exportVariable('PATH', swigRoot + ':' + process.env.PATH);
