@@ -23,7 +23,6 @@ async function run() {
     const version = process.env.SETUP_SWIG_VERSION || await core.getInput('version', { required: false });
     const branch = process.env.SETUP_SWIG_BRANCH || await core.getInput('branch', { required: false });
     const shouldCache = await core.getBooleanInput('cache', { required: false });
-    core.info(`shouldCahce = ${shouldCache}`);
 
     if (!repos[branch]) throw new Error('Invalid branch');
 

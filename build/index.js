@@ -79,7 +79,6 @@ function run() {
                     return [4 /*yield*/, core.getBooleanInput('cache', { required: false })];
                 case 5:
                     shouldCache = _e.sent();
-                    core.info("shouldCahce = ".concat(shouldCache));
                     if (!repos[branch_1])
                         throw new Error('Invalid branch');
                     return [4 /*yield*/, octokit.request('GET /repos/{owner}/{repo}/tags', {
