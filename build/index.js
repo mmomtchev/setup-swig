@@ -76,7 +76,7 @@ function run() {
                     _e.label = 4;
                 case 4:
                     branch_1 = _b;
-                    return [4 /*yield*/, core.getInput('cache')];
+                    return [4 /*yield*/, core.getBooleanInput('cache')];
                 case 5:
                     shouldCache = _e.sent();
                     if (!repos[branch_1])
