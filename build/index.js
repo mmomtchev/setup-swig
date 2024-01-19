@@ -62,7 +62,7 @@ function run() {
                     }
                     _a = process.env.SETUP_SWIG_VERSION;
                     if (_a) return [3 /*break*/, 2];
-                    return [4 /*yield*/, core.getInput('version')];
+                    return [4 /*yield*/, core.getInput('version', { required: false })];
                 case 1:
                     _a = (_e.sent());
                     _e.label = 2;
@@ -70,15 +70,16 @@ function run() {
                     version_1 = _a;
                     _b = process.env.SETUP_SWIG_BRANCH;
                     if (_b) return [3 /*break*/, 4];
-                    return [4 /*yield*/, core.getInput('branch')];
+                    return [4 /*yield*/, core.getInput('branch', { required: false })];
                 case 3:
                     _b = (_e.sent());
                     _e.label = 4;
                 case 4:
                     branch_1 = _b;
-                    return [4 /*yield*/, core.getBooleanInput('cache')];
+                    return [4 /*yield*/, core.getBooleanInput('cache', { required: false })];
                 case 5:
                     shouldCache = _e.sent();
+                    core.info("shouldCahce = ".concat(shouldCache));
                     if (!repos[branch_1])
                         throw new Error('Invalid branch');
                     return [4 /*yield*/, octokit.request('GET /repos/{owner}/{repo}/tags', {
