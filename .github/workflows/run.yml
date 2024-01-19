@@ -24,7 +24,7 @@ jobs:
         version: v4.1.0
 
     - name: Verify
-      run: swig-jse -version
+      run: swig -version
 
 
   jse:
