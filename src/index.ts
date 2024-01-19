@@ -1,11 +1,8 @@
 import * as core from '@actions/core';
 import * as exec from '@actions/exec';
 import * as tc from '@actions/tool-cache';
-import * as cache from '@actions/cache';
-import * as io from '@actions/io';
 import { Octokit } from '@octokit/core';
 import * as os from 'os';
-import * as fs from 'fs';
 import * as path from 'path';
 
 const repos = {
@@ -13,7 +10,7 @@ const repos = {
   jse: { owner: 'mmomtchev', repo: 'swig' }
 };
 
-const octokit = new Octokit;
+const octokit = new Octokit({ auth: process.env.GITHUB_TOKEN });
 
 async function run() {
   try {
@@ -21,8 +18,8 @@ async function run() {
       throw new Error('Only Linux runners are supported at the moment');
     }
 
-    const version = await core.getInput('version');
-    const branch = await core.getInput('branch');
+    const version = process.env.SETUP_SWIG_VERSION || await core.getInput('version');
+    const branch = process.env.SETUP_SWIG_BRANCH || await core.getInput('branch');
 
     if (!repos[branch]) throw new Error('Invalid branch');
 
@@ -32,23 +29,44 @@ async function run() {
       headers: {
         'X-GitHub-Api-Version': '2022-11-28'
       }
-    }).then((tags) => tags.data.sort((a, b) => a.name.localeCompare(b.name)).reverse());
+    })
+      .then((tags) => Promise.all(tags.data.map(async (t) => {
+        const date = new Date((await octokit.request('GET /repos/{owner}/{repo}/commits/{tag}', {
+          tag: t.name,
+          owner: repos[branch].owner,
+          repo: repos[branch].repo,
+          headers: {
+            'X-GitHub-Api-Version': '2022-11-28'
+          }
+        })).data.commit.author.date);
+        return ({
+          name: t.name,
+          tarball_url: t.tarball_url,
+          date
+        });
+      }))
+        .then((tags) => tags.sort((a, b) => a.date.getTime() - b.date.getTime()).reverse()));
 
-    const tag = version === 'last' ? tags[0] : tags.find((t) => t.name === version);
+    const tag = version === 'latest' ? tags[0] : tags.find((t) => t.name === version);
     if (!tag) throw new Error('Invalid version');
+    core.info(`Downloading from ${tag.tarball_url}`);
 
     const target = path.join(process.env.GITHUB_WORKSPACE!, 'swig');
-    console.log(`Installing SWIG${branch !== 'main' ? `-${branch}` : ''} ${tag.name} in ${target}`);
+    core.info(`Installing SWIG${branch !== 'main' ? `-${branch}` : ''} ${tag.name} in ${target}`);
 
     const swigArchive = await tc.downloadTool(tag.tarball_url);
-    const swigRoot = await tc.extractTar(swigArchive, target);
+    const swigRoot = await tc.extractTar(swigArchive, target, ['-zx', '--strip-components=1']);
 
-    await exec.exec(`cd swig/swig-${version} && sh autogen.sh && ./configure && make`);
+    await exec.exec('sh', ['autogen.sh'], { cwd: swigRoot });
+    await exec.exec('sh', ['configure'], { cwd: swigRoot });
+    await exec.exec('make', [], { cwd: swigRoot });
+
+    await exec.exec('ln', ['-s', 'swig', `swig-${branch}`], { cwd: swigRoot });
 
     core.exportVariable('SWIG_LIB', path.resolve(swigRoot, 'Lib'));
-    core.exportVariable('PATH', process.env.PATH + ':' + swigRoot)
+    core.exportVariable('PATH', swigRoot + ':' + process.env.PATH);
   } catch (error) {
-    if (error && 
+    if (error &&
       typeof error === 'object' &&
       'message' in error &&
       (

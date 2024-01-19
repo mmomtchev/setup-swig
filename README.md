@@ -30,8 +30,27 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
+      - uses: mmomtchev/setup-swig@first-run
+        with:
+          branch: jse
+
+      - name: Verify
+        run: swig -version
+```
+
+Specific version:
+
+```yaml
+name: "my-projec"
+on: [push]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
       - uses: mmomtchev/setup-swig@v1
-        branch: jse
+        with:
+          version: v4.1.0
 
       - name: Verify
         run: swig -version

@@ -8,8 +8,35 @@ jobs:
       matrix:
         os: [ubuntu-latest]
     steps:
-    - uses: mmomtchev/setup-swig@main
+    - uses: mmomtchev/setup-swig@first-run
 
     - name: Verify
       run: swig -version
+
+  version:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest]
+    steps:
+    - uses: mmomtchev/setup-swig@first-run
+      with:
+        version: v4.1.0
+
+    - name: Verify
+      run: swig -version
+
+
+  jse:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest]
+    steps:
+    - uses: mmomtchev/setup-swig@first-run
+      with:
+        branch: jse
+
+    - name: Verify
+      run: swig-jse -version
 
