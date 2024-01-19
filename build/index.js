@@ -39,9 +39,11 @@ Object.defineProperty(exports, "__esModule", { value: true });
 var core = require("@actions/core");
 var exec = require("@actions/exec");
 var tc = require("@actions/tool-cache");
+var cache = require("@actions/cache");
 var core_1 = require("@octokit/core");
 var os = require("os");
 var path = require("path");
+var fs = require("fs");
 var repos = {
     main: { owner: 'swig', repo: 'swig' },
     jse: { owner: 'mmomtchev', repo: 'swig' }
@@ -49,31 +51,34 @@ var repos = {
 var octokit = new core_1.Octokit({ auth: process.env.GITHUB_TOKEN });
 function run() {
     return __awaiter(this, void 0, void 0, function () {
-        var version_1, _a, branch_1, _b, tags, tag, target, swigArchive, swigRoot, error_1;
+        var version_1, _a, branch_1, _b, shouldCache, tags, tag, swigRoot, cached, cacheKey, _c, _d, swigArchive, error_1;
         var _this = this;
-        return __generator(this, function (_c) {
-            switch (_c.label) {
+        return __generator(this, function (_e) {
+            switch (_e.label) {
                 case 0:
-                    _c.trys.push([0, 12, , 13]);
+                    _e.trys.push([0, 22, , 23]);
                     if (os.platform() !== 'linux') {
                         throw new Error('Only Linux runners are supported at the moment');
                     }
                     _a = process.env.SETUP_SWIG_VERSION;
                     if (_a) return [3 /*break*/, 2];
-                    return [4 /*yield*/, core.getInput('version')];
+                    return [4 /*yield*/, core.getInput('version', { required: false })];
                 case 1:
-                    _a = (_c.sent());
-                    _c.label = 2;
+                    _a = (_e.sent());
+                    _e.label = 2;
                 case 2:
                     version_1 = _a;
                     _b = process.env.SETUP_SWIG_BRANCH;
                     if (_b) return [3 /*break*/, 4];
-                    return [4 /*yield*/, core.getInput('branch')];
+                    return [4 /*yield*/, core.getInput('branch', { required: false })];
                 case 3:
-                    _b = (_c.sent());
-                    _c.label = 4;
+                    _b = (_e.sent());
+                    _e.label = 4;
                 case 4:
                     branch_1 = _b;
+                    return [4 /*yield*/, core.getBooleanInput('cache', { required: false })];
+                case 5:
+                    shouldCache = _e.sent();
                     if (!repos[branch_1])
                         throw new Error('Invalid branch');
                     return [4 /*yield*/, octokit.request('GET /repos/{owner}/{repo}/tags', {
@@ -108,37 +113,72 @@ function run() {
                             });
                         }); }))
                             .then(function (tags) { return tags.sort(function (a, b) { return a.date.getTime() - b.date.getTime(); }).reverse(); }); })];
-                case 5:
-                    tags = _c.sent();
+                case 6:
+                    tags = _e.sent();
                     tag = version_1 === 'latest' ? tags[0] : tags.find(function (t) { return t.name === version_1; });
                     if (!tag)
                         throw new Error('Invalid version');
-                    core.info("Downloading from ".concat(tag.tarball_url));
-                    target = path.join(process.env.GITHUB_WORKSPACE, 'swig');
-                    core.info("Installing SWIG".concat(branch_1 !== 'main' ? "-".concat(branch_1) : '', " ").concat(tag.name, " in ").concat(target));
-                    return [4 /*yield*/, tc.downloadTool(tag.tarball_url)];
-                case 6:
-                    swigArchive = _c.sent();
-                    return [4 /*yield*/, tc.extractTar(swigArchive, target, ['-zx', '--strip-components=1'])];
+                    swigRoot = path.join(process.env.GITHUB_WORKSPACE, 'swig');
+                    cached = false;
+                    cacheKey = "swig-".concat(branch_1, "-").concat(tag.name, "-").concat(os.platform(), "-").concat(os.arch(), "-").concat(os.release());
+                    if (!shouldCache) return [3 /*break*/, 13];
+                    _e.label = 7;
                 case 7:
-                    swigRoot = _c.sent();
-                    return [4 /*yield*/, exec.exec('sh', ['autogen.sh'], { cwd: swigRoot })];
+                    _e.trys.push([7, 12, , 13]);
+                    _e.label = 8;
                 case 8:
-                    _c.sent();
-                    return [4 /*yield*/, exec.exec('sh', ['configure'], { cwd: swigRoot })];
+                    _e.trys.push([8, 9, , 11]);
+                    fs.accessSync(swigRoot, fs.constants.X_OK);
+                    return [3 /*break*/, 11];
                 case 9:
-                    _c.sent();
-                    return [4 /*yield*/, exec.exec('make', [], { cwd: swigRoot })];
+                    _c = _e.sent();
+                    return [4 /*yield*/, cache.restoreCache([swigRoot], cacheKey)];
                 case 10:
-                    _c.sent();
-                    return [4 /*yield*/, exec.exec('ln', ['-s', 'swig', "swig-".concat(branch_1)], { cwd: swigRoot })];
+                    _e.sent();
+                    return [3 /*break*/, 11];
                 case 11:
-                    _c.sent();
-                    core.exportVariable('SWIG_LIB', path.resolve(swigRoot, 'Lib'));
-                    core.exportVariable('PATH', swigRoot + ':' + process.env.PATH);
+                    fs.accessSync(swigRoot, fs.constants.X_OK);
+                    core.info("Found cached instance ".concat(cacheKey));
+                    cached = true;
                     return [3 /*break*/, 13];
                 case 12:
-                    error_1 = _c.sent();
+                    _d = _e.sent();
+                    core.info('Rebuilding from source');
+                    return [3 /*break*/, 13];
+                case 13:
+                    if (!!cached) return [3 /*break*/, 21];
+                    core.info("Downloading from ".concat(tag.tarball_url));
+                    core.info("Installing SWIG".concat(branch_1 !== 'main' ? "-".concat(branch_1) : '', " ").concat(tag.name, " in ").concat(swigRoot));
+                    return [4 /*yield*/, tc.downloadTool(tag.tarball_url)];
+                case 14:
+                    swigArchive = _e.sent();
+                    return [4 /*yield*/, tc.extractTar(swigArchive, swigRoot, ['-zx', '--strip-components=1'])];
+                case 15:
+                    _e.sent();
+                    return [4 /*yield*/, exec.exec('sh', ['autogen.sh'], { cwd: swigRoot })];
+                case 16:
+                    _e.sent();
+                    return [4 /*yield*/, exec.exec('sh', ['configure'], { cwd: swigRoot })];
+                case 17:
+                    _e.sent();
+                    return [4 /*yield*/, exec.exec('make', [], { cwd: swigRoot })];
+                case 18:
+                    _e.sent();
+                    return [4 /*yield*/, exec.exec('ln', ['-s', 'swig', "swig-".concat(branch_1)], { cwd: swigRoot })];
+                case 19:
+                    _e.sent();
+                    if (!shouldCache) return [3 /*break*/, 21];
+                    return [4 /*yield*/, cache.saveCache([swigRoot], cacheKey)];
+                case 20:
+                    _e.sent();
+                    core.info("Saved to cache ".concat(cacheKey));
+                    _e.label = 21;
+                case 21:
+                    core.exportVariable('SWIG_LIB', path.resolve(swigRoot, 'Lib'));
+                    core.exportVariable('PATH', swigRoot + ':' + process.env.PATH);
+                    return [3 /*break*/, 23];
+                case 22:
+                    error_1 = _e.sent();
                     if (error_1 &&
                         typeof error_1 === 'object' &&
                         'message' in error_1 &&
@@ -146,8 +186,8 @@ function run() {
                             error_1.message instanceof Error)) {
                         core.setFailed(error_1.message);
                     }
-                    return [3 /*break*/, 13];
-                case 13: return [2 /*return*/];
+                    return [3 /*break*/, 23];
+                case 23: return [2 /*return*/];
             }
         });
     });
