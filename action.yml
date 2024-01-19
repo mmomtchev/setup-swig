@@ -1,0 +1,16 @@
+name: 'Setup SWIG'
+description: 'Download and install a version of SWIG'
+author: 'mmomtchev'
+inputs:
+  version:
+    description: 'Version to install'
+    default: 'latest'
+  branch:
+    description: 'Branch to install'
+    default: 'main'
+runs:
+  using: 'node20'
+  main: 'dist/index.js'
+branding:
+  icon: 'download'
+  color: 'green'

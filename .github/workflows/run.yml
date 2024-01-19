@@ -1,0 +1,15 @@
+name: 'Run'
+on: [pull_request, push]
+
+jobs:
+  defaults:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest]
+    steps:
+    - uses: mmomtchev/setup-swig@main
+
+    - name: Verify
+      run: swig -version
+
