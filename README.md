@@ -7,7 +7,7 @@ This actions step downloads and installs a version of SWIG.
 For the latest version on the main branch:
 
 ```yaml
-name: "my-projec"
+name: "my-project"
 on: [push]
 
 jobs:
@@ -23,14 +23,14 @@ jobs:
 For SWIG JSE:
 
 ```yaml
-name: "my-projec"
+name: "my-project"
 on: [push]
 
 jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - uses: mmomtchev/setup-swig@first-run
+      - uses: mmomtchev/setup-swig@v1
         with:
           branch: jse
 
@@ -41,7 +41,7 @@ jobs:
 Specific version:
 
 ```yaml
-name: "my-projec"
+name: "my-project"
 on: [push]
 
 jobs:
