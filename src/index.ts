@@ -34,6 +34,8 @@ async function run() {
       }
     }).then((tags) => tags.data.sort((a, b) => a.name.localeCompare(b.name)).reverse());
 
+    console.log(tags);
+    console.log(version);
     const tag = version === 'last' ? tags[0] : tags.find((t) => t.name === version);
     if (!tag) throw new Error('Invalid version');
 
