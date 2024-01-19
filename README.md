@@ -61,12 +61,15 @@ jobs:
 ## Options
 
 ```yaml
-version:
-  description: 'Version to install'
-  default: 'latest'
-branch:
-  description: 'Branch to install'
-  default: 'main'
+  version:
+    description: 'Version to install'
+    default: 'latest'
+  branch:
+    description: 'Branch to install'
+    default: 'main'
+  cache:
+    description: 'Cache builds'
+    default: true
 ```
 
 See [action.yml](action.yml)
