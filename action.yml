@@ -11,6 +11,9 @@ inputs:
   cache:
     description: 'Cache builds'
     default: true
+  debug:
+    description: 'Verbose output'
+    default: false
 runs:
   using: 'node20'
   main: 'dist/index.js'

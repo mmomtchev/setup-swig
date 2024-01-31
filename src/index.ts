@@ -20,35 +20,22 @@ async function run() {
       throw new Error('Only Linux runners are supported at the moment');
     }
 
-    const version = process.env.SETUP_SWIG_VERSION || await core.getInput('version', { required: false });
-    const branch = process.env.SETUP_SWIG_BRANCH || await core.getInput('branch', { required: false });
+    const version = await core.getInput('version', { required: false });
+    const branch = await core.getInput('branch', { required: false });
     const shouldCache = await core.getBooleanInput('cache', { required: false });
+    const debug = await core.getBooleanInput('debug', { required: false });
 
     if (!repos[branch]) throw new Error('Invalid branch');
+    if (debug) core.debug(`Retrieving SWIG-${branch}-${version}`);
 
-    const tags = await octokit.request('GET /repos/{owner}/{repo}/tags', {
+    const tags = (await octokit.request('GET /repos/{owner}/{repo}/tags', {
       owner: repos[branch].owner,
       repo: repos[branch].repo,
       headers: {
         'X-GitHub-Api-Version': '2022-11-28'
       }
-    })
-      .then((tags) => Promise.all(tags.data.map(async (t) => {
-        const date = new Date((await octokit.request('GET /repos/{owner}/{repo}/commits/{tag}', {
-          tag: t.name,
-          owner: repos[branch].owner,
-          repo: repos[branch].repo,
-          headers: {
-            'X-GitHub-Api-Version': '2022-11-28'
-          }
-        })).data.commit.author.date);
-        return ({
-          name: t.name,
-          tarball_url: t.tarball_url,
-          date
-        });
-      }))
-        .then((tags) => tags.sort((a, b) => a.date.getTime() - b.date.getTime()).reverse()));
+    })).data;
+    if (debug) tags.forEach((t) => core.debug(`Found tag ${t.name}`));
 
     const tag = version === 'latest' ? tags[0] : tags.find((t) => t.name === version);
     if (!tag) throw new Error('Invalid version');
@@ -57,6 +44,7 @@ async function run() {
 
     let cached = false;
     const cacheKey = `swig-${branch}-${tag.name}-${os.platform()}-${os.arch()}-${os.release()}`;
+    if (debug) core.debug(`Using cacheKey ${cacheKey}, swigRoot ${swigRoot}`);
     if (shouldCache) {
       try {
         try {
@@ -93,6 +81,7 @@ async function run() {
 
     core.exportVariable('SWIG_LIB', path.resolve(swigRoot, 'Lib'));
     core.exportVariable('PATH', swigRoot + ':' + process.env.PATH);
+    if (debug) core.debug(`exporting SWIG_LIB=${path.resolve(swigRoot, 'Lib')} PATH=${swigRoot + ':' + process.env.PATH}`);
   } catch (error) {
     if (error &&
       typeof error === 'object' &&
