@@ -74,8 +74,16 @@ async function run() {
       await exec.exec('ln', ['-s', 'swig', `swig-${branch}`], { cwd: swigRoot });
 
       if (shouldCache) {
-        await cache.saveCache([swigRoot], cacheKey);
-        core.info(`Saved to cache ${cacheKey}`);
+        try {
+          await cache.saveCache([swigRoot], cacheKey);
+          core.info(`Saved to cache ${cacheKey}`);
+        } catch (e) {
+          core.notice(`Failed saving SWIG to cache with key ${cacheKey}, ` +
+            `Github API responded "${e.message}, ` +
+            'next install will rebuild from source, ' +
+            'if this happens intermittently, it may be a temporary Github problem or ' + 
+            'a conflict between concurrent install jobs.');
+        }
       }
     }
 
