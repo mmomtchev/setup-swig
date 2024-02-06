@@ -7,8 +7,12 @@ jobs:
     strategy:
       matrix:
         os: [ubuntu-latest]
+        cache: [true, false]
     steps:
     - uses: mmomtchev/setup-swig@main
+      with:
+        cache: ${{ matrix.cache }}
+        verbose: true
 
     - name: Verify
       run: swig -version
@@ -18,10 +22,13 @@ jobs:
     strategy:
       matrix:
         os: [ubuntu-latest]
+        cache: [true, false]
     steps:
     - uses: mmomtchev/setup-swig@main
       with:
         version: v4.1.0
+        cache: ${{ matrix.cache }}
+        verbose: true
 
     - name: Verify
       run: swig -version
@@ -32,10 +39,13 @@ jobs:
     strategy:
       matrix:
         os: [ubuntu-latest]
+        cache: [true, false]
     steps:
     - uses: mmomtchev/setup-swig@main
       with:
         branch: jse
+        cache: ${{ matrix.cache }}
+        verbose: true
 
     - name: Verify
       run: swig-jse -version
