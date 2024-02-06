@@ -5,7 +5,7 @@
   "description": "GitHub action to download and setup SWIG",
   "main": "dist/index.js",
   "scripts": {
-    "prepare": "npx tsc && npx ncc build build/index.js",
+    "prepare": "npx ncc build src/index.ts -o dist/index.js",
     "test": "mkdir -p install/tmp && RUNNER_TEMP=install/tmp RUNNER_TOOL_CACHE=install INPUT_VERSION=latest INPUT_BRANCH=jse INPUT_CACHE=false INPUT_DEBUG=false ts-node src/index.ts && install/swig/swig-jse -version"
   },
   "repository": {
