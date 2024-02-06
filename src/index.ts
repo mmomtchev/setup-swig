@@ -16,17 +16,18 @@ const octokit = new Octokit({ auth: process.env.GITHUB_TOKEN });
 
 async function run() {
   try {
+    const verbose = core.getBooleanInput('verbose', { required: false });
+    if (verbose) core.info(`setup-swig ${require('../package.json').version} ${require('./git.json').git}`);
     if (os.platform() !== 'linux') {
       throw new Error('Only Linux runners are supported at the moment');
     }
 
-    const version = await core.getInput('version', { required: false });
-    const branch = await core.getInput('branch', { required: false });
-    const shouldCache = await core.getBooleanInput('cache', { required: false });
-    const debug = await core.getBooleanInput('debug', { required: false });
+    const version = core.getInput('version', { required: false });
+    const branch = core.getInput('branch', { required: false });
+    const shouldCache = core.getBooleanInput('cache', { required: false });
 
     if (!repos[branch]) throw new Error('Invalid branch');
-    if (debug) core.debug(`Retrieving SWIG-${branch}-${version}`);
+    if (verbose) core.info(`Retrieving SWIG-${branch}-${version}`);
 
     const tags = (await octokit.request('GET /repos/{owner}/{repo}/tags', {
       owner: repos[branch].owner,
@@ -35,7 +36,7 @@ async function run() {
         'X-GitHub-Api-Version': '2022-11-28'
       }
     })).data;
-    if (debug) tags.forEach((t) => core.debug(`Found tag ${t.name}`));
+    if (verbose) tags.forEach((t) => core.info(`Found tag ${t.name}`));
 
     const tag = version === 'latest' ? tags[0] : tags.find((t) => t.name === version);
     if (!tag) throw new Error('Invalid version');
@@ -44,7 +45,7 @@ async function run() {
 
     let cached = false;
     const cacheKey = `swig-${branch}-${tag.name}-${os.platform()}-${os.arch()}-${os.release()}`;
-    if (debug) core.debug(`Using cacheKey ${cacheKey}, swigRoot ${swigRoot}`);
+    if (verbose) core.info(`Using cacheKey ${cacheKey}, swigRoot ${swigRoot}`);
     if (shouldCache) {
       try {
         try {
@@ -89,7 +90,7 @@ async function run() {
 
     core.exportVariable('SWIG_LIB', path.resolve(swigRoot, 'Lib'));
     core.exportVariable('PATH', swigRoot + ':' + process.env.PATH);
-    if (debug) core.debug(`exporting SWIG_LIB=${path.resolve(swigRoot, 'Lib')} PATH=${swigRoot + ':' + process.env.PATH}`);
+    if (verbose) core.info(`exporting SWIG_LIB=${path.resolve(swigRoot, 'Lib')} PATH=${swigRoot + ':' + process.env.PATH}`);
   } catch (error) {
     if (error &&
       typeof error === 'object' &&

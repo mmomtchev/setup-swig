@@ -11,7 +11,7 @@ inputs:
   cache:
     description: 'Cache builds'
     default: true
-  debug:
+  verbose:
     description: 'Verbose output'
     default: false
 runs:

@@ -1,12 +1,12 @@
 {
   "name": "setup-swig",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "private": true,
   "description": "GitHub action to download and setup SWIG",
   "main": "dist/index.js",
   "scripts": {
-    "prepare": "npx ncc build src/index.ts -m -o dist",
-    "test": "mkdir -p install/tmp && RUNNER_TEMP=install/tmp RUNNER_TOOL_CACHE=install INPUT_VERSION=latest INPUT_BRANCH=jse INPUT_CACHE=false INPUT_VERBOSE=false node dist/index.js && install/swig/swig-jse -version"
+    "prepare": "git log -1 --pretty='format:{ \"git\": \"%h\" }' > src/git.json && npx ncc build src/index.ts -m -o dist",
+    "test": "mkdir -p install/tmp && RUNNER_TEMP=install/tmp RUNNER_TOOL_CACHE=install INPUT_VERSION=latest INPUT_BRANCH=jse INPUT_CACHE=false INPUT_VERBOSE=true node dist/index.js && install/swig/swig-jse -version"
   },
   "repository": {
     "type": "git",
