@@ -50,3 +50,20 @@ jobs:
     - name: Verify
       run: swig-jse -version
 
+  jse-main:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest]
+        cache: [true, false]
+    steps:
+    - uses: mmomtchev/setup-swig@main
+      with:
+        branch: jse
+        version: main
+        cache: ${{ matrix.cache }}
+        verbose: true
+
+    - name: Verify
+      run: swig-jse -version
+

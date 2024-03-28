@@ -38,8 +38,20 @@ async function run() {
     })).data;
     if (verbose) tags.forEach((t) => core.info(`Found tag ${t.name}`));
 
-    const tag = version === 'latest' ? tags[0] : tags.find((t) => t.name === version);
-    if (!tag) throw new Error('Invalid version');
+    let tag: {
+      name: string;
+      tarball_url: string;
+    };
+    if (version === 'latest') {
+      tag = tags[0];
+    } else if (tags.find((t) => t.name === version)) {
+      tag = tags.find((t) => t.name === version);
+    } else {
+      tag = {
+        name: version,
+        tarball_url: `https://github.com/${repos[branch].owner}/${repos[branch].repo}/archive/${version}.tar.gz`
+      };
+    }
 
     const swigRoot = path.join(process.env.RUNNER_TOOL_CACHE!, 'swig');
 
