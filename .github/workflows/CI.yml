@@ -5,6 +5,7 @@ on:
       - '*'
       - '!main'
 
+
 jobs:
   defaults:
     runs-on: ${{ matrix.os }}
@@ -22,6 +23,7 @@ jobs:
 
     - name: Verify
       run: swig -version
+
 
   version:
     runs-on: ${{ matrix.os }}
@@ -60,6 +62,7 @@ jobs:
     - name: Verify
       run: swig-jse -version
 
+
   jse-main:
     runs-on: ${{ matrix.os }}
     strategy:
@@ -79,3 +82,23 @@ jobs:
     - name: Verify
       run: swig-jse -version
 
+
+  auth:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest]
+        cache: [true, false]
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v4
+    - uses: ./
+      with:
+        branch: jse
+        version: main
+        cache: ${{ matrix.cache }}
+        verbose: true
+        token: $${{ secrets.GITHUB_TOKEN }}
+
+    - name: Verify
+      run: swig-jse -version
