@@ -1,5 +1,10 @@
-name: 'Run'
-on: [pull_request, push]
+name: 'QA'
+on:
+  pull_request:
+    branches: main
+  push:
+    branches: main
+
 
 jobs:
   defaults:
@@ -16,6 +21,7 @@ jobs:
 
     - name: Verify
       run: swig -version
+
 
   version:
     runs-on: ${{ matrix.os }}
@@ -50,6 +56,7 @@ jobs:
     - name: Verify
       run: swig-jse -version
 
+
   jse-main:
     runs-on: ${{ matrix.os }}
     strategy:
@@ -67,3 +74,23 @@ jobs:
     - name: Verify
       run: swig-jse -version
 
+
+  auth:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest]
+        cache: [true, false]
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v4
+    - uses: mmomtchev/setup-swig@main
+      with:
+        branch: jse
+        version: main
+        cache: ${{ matrix.cache }}
+        verbose: true
+        token: ${{ secrets.GITHUB_TOKEN }}
+
+    - name: Verify
+      run: swig-jse -version

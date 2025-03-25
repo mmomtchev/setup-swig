@@ -12,7 +12,21 @@ const repos = {
   jse: { owner: 'mmomtchev', repo: 'swig' }
 };
 
-const octokit = new Octokit({ auth: process.env.GITHUB_TOKEN });
+let token: string = undefined;
+const inputToken = core.getInput('token', { required: false });
+const envToken = process.env.GITHUB_TOKEN;
+
+if (inputToken) {
+  core.info('Using authentication token passed as input');
+  token = inputToken;
+} else if (envToken) {
+  core.info('Using authentication token from the environment');
+  token = envToken;
+} else {
+  core.info('Not using authentication, pass token argument if you get API rate errors');
+}
+
+const octokit = new Octokit({ auth: token });
 
 async function run() {
   try {
@@ -94,7 +108,7 @@ async function run() {
           core.notice(`Failed saving SWIG to cache with key ${cacheKey}, ` +
             `Github API responded "${e.message}, ` +
             'next install will rebuild from source, ' +
-            'if this happens intermittently, it may be a temporary Github problem or ' + 
+            'if this happens intermittently, it may be a temporary Github problem or ' +
             'a conflict between concurrent install jobs.');
         }
       }
