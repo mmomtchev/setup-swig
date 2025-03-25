@@ -1,0 +1,73 @@
+name: 'CI'
+on:
+  push:
+    branches:
+      - '*'
+      - '!main'
+
+jobs:
+  defaults:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest]
+        cache: [true, false]
+    steps:
+    - uses: ./
+      with:
+        cache: ${{ matrix.cache }}
+        verbose: true
+
+    - name: Verify
+      run: swig -version
+
+  version:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest]
+        cache: [true, false]
+    steps:
+    - uses: ./
+      with:
+        version: v4.1.0
+        cache: ${{ matrix.cache }}
+        verbose: true
+
+    - name: Verify
+      run: swig -version
+
+
+  jse:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest]
+        cache: [true, false]
+    steps:
+    - uses: ./
+      with:
+        branch: jse
+        cache: ${{ matrix.cache }}
+        verbose: true
+
+    - name: Verify
+      run: swig-jse -version
+
+  jse-main:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest]
+        cache: [true, false]
+    steps:
+    - uses: ./
+      with:
+        branch: jse
+        version: main
+        cache: ${{ matrix.cache }}
+        verbose: true
+
+    - name: Verify
+      run: swig-jse -version
+

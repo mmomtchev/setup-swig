@@ -1,3 +1,6 @@
+# v4 2025-03-25
+ - Support making authenticated Github API calls by providing an authentication token
+
 # v3 2023-03-28
  - Support installing the git `HEAD`
 
