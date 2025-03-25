@@ -98,7 +98,7 @@ jobs:
         version: main
         cache: ${{ matrix.cache }}
         verbose: true
-        token: $${{ secrets.GITHUB_TOKEN }}
+        token: ${{ secrets.GITHUB_TOKEN }}
 
     - name: Verify
       run: swig-jse -version
