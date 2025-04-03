@@ -7,7 +7,25 @@ on:
 
 
 jobs:
+  transpile:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v4
+    - name: Install and transpile
+      run: npm install
+    - name: Update /dist
+      uses: EndBug/add-and-commit@v9
+      with:
+        add: 'dist'
+        message: 'Rebuild'
+
+
   defaults:
+    needs: transpile
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
@@ -27,6 +45,7 @@ jobs:
 
   version:
     runs-on: ${{ matrix.os }}
+    needs: transpile
     strategy:
       matrix:
         os: [ubuntu-latest]
@@ -45,6 +64,7 @@ jobs:
 
 
   jse:
+    needs: transpile
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
@@ -64,6 +84,7 @@ jobs:
 
 
   jse-main:
+    needs: transpile
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
@@ -84,6 +105,7 @@ jobs:
 
 
   auth:
+    needs: transpile
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
