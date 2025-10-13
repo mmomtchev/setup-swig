@@ -94,6 +94,10 @@ async function binary() {
           } : undefined
       });
       output.write(Buffer.from(dist.data as unknown as ArrayBuffer));
+      await new Promise((resolve, reject) => {
+        output.on('close', resolve);
+        output.on('error', reject);
+      });
 
       core.info(`Binary distribution of SWIG-${branch} ${release.name} successfully installed in ${swigRoot}`);
       const exePath = path.join(swigRoot, 'bin');

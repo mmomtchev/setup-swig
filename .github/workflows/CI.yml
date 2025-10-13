@@ -28,6 +28,7 @@ jobs:
     needs: transpile
     runs-on: ${{ matrix.os }}
     strategy:
+      fail-fast: false
       matrix:
         os: [ubuntu-latest]
         cache: [true, false]
@@ -49,6 +50,7 @@ jobs:
     runs-on: ${{ matrix.os }}
     needs: transpile
     strategy:
+      fail-fast: false
       matrix:
         os: [ubuntu-latest]
         cache: [true, false]
@@ -69,17 +71,20 @@ jobs:
     needs: transpile
     runs-on: ${{ matrix.os }}
     strategy:
+      fail-fast: false
       matrix:
         os: [ubuntu-latest]
         cache: [true, false]
     steps:
     - name: Checkout
       uses: actions/checkout@v5
-    - uses: ./
+    - name: setup-swig
+      uses: ./
       with:
         branch: jse
         cache: ${{ matrix.cache }}
         verbose: true
+        build: true
 
     - name: Verify
       run: |
@@ -91,13 +96,15 @@ jobs:
     needs: transpile
     runs-on: ${{ matrix.os }}
     strategy:
+      fail-fast: false
       matrix:
         os: [ubuntu-latest]
         cache: [true, false]
     steps:
     - name: Checkout
       uses: actions/checkout@v5
-    - uses: ./
+    - name: setup-swig
+      uses: ./
       with:
         branch: jse
         version: main
@@ -114,6 +121,7 @@ jobs:
     needs: transpile
     runs-on: ${{ matrix.os }}
     strategy:
+      fail-fast: false
       matrix:
         os: [ubuntu-latest]
         cache: [true, false]
