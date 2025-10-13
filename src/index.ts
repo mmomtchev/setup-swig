@@ -113,7 +113,7 @@ async function build() {
 
   if (!repos[branch]) throw new Error('Invalid branch');
 
-  if (verbose) core.info(`Retrieving SWIG-${branch}-${version}`);
+  if (verbose) core.info(`Building from source SWIG-${branch}-${version}`);
 
   const tags = (await octokit.request('GET /repos/{owner}/{repo}/tags', {
     owner: repos[branch].owner,
