@@ -128,7 +128,8 @@ jobs:
     steps:
     - name: Checkout
       uses: actions/checkout@v5
-    - uses: ./
+    - name: setup-swig
+      uses: ./
       with:
         branch: jse
         version: main
@@ -146,12 +147,14 @@ jobs:
     needs: transpile
     runs-on: ${{ matrix.os }}
     strategy:
+      fail-fast: false
       matrix:
         os: [ubuntu-latest, macos-latest, windows-latest]
     steps:
     - name: Checkout
       uses: actions/checkout@v5
-    - uses: ./
+    - name: setup-swig
+      uses: ./
       with:
         branch: jse
         version: 5.0.8
