@@ -153,4 +153,5 @@ jobs:
     - name: Verify
       run: |
         swig-jse -version
+        swig-jse -swiglib
         swig-jse -javascript -napi -c++ test/example.i
