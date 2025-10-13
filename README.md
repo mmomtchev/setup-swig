@@ -2,7 +2,9 @@
 
 This actions step downloads and installs a version of SWIG.
 
-At the moment it supports only Linux runners.
+It supports Linux, Windows and macOS runners when installing a precompiled binary distribution of SWIG JSE.
+
+It also supports rebuilding any version of SWIG on Linux runners only.
 
 You can check the [`magickwand.js` workflows](https://github.com/mmomtchev/magickwand.js/tree/main/.github/workflows) for an example of a complex project that uses it.
 
@@ -78,6 +80,9 @@ jobs:
   token:
     description: 'Optional authentication token'
     default: ''
+  build:
+    description: 'Build SWIG from source even if a binary distribution is available'
+    default: false
 ```
 
 See [action.yml](action.yml)
