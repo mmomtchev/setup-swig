@@ -11,6 +11,9 @@ inputs:
   cache:
     description: 'Cache builds'
     default: true
+  build:
+    description: 'Build SWIG from source even if a binary distribution is available'
+    default: false
   verbose:
     description: 'Verbose output'
     default: false
