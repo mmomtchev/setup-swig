@@ -163,7 +163,6 @@ jobs:
 
     - name: Verify
       run: |
-        which swig-jse
         swig-jse -version
-        swig-jse -swiglib
-        swig-jse -javascript -napi -c++ test/example.i
+        ./swig/bin/swig-jse -swiglib
+        ./swig/bin/swig-jse -javascript -napi -c++ test/example.i
