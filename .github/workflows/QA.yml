@@ -44,7 +44,9 @@ jobs:
         verbose: true
 
     - name: Verify
-      run: swig -version
+      run: |
+        swig-jse -version
+        swig-jse -javascript -napi -c++ test/example.i
 
 
   version:
@@ -61,7 +63,9 @@ jobs:
         verbose: true
 
     - name: Verify
-      run: swig -version
+      run: |
+        swig-jse -version
+        swig-jse -javascript -napi -c++ test/example.i
 
 
   jse:
@@ -78,7 +82,9 @@ jobs:
         verbose: true
 
     - name: Verify
-      run: swig-jse -version
+      run: |
+        swig-jse -version
+        swig-jse -javascript -napi -c++ test/example.i
 
 
   jse-main:
@@ -96,7 +102,9 @@ jobs:
         verbose: true
 
     - name: Verify
-      run: swig-jse -version
+      run: |
+        swig-jse -version
+        swig-jse -javascript -napi -c++ test/example.i
 
 
   auth:
@@ -117,4 +125,27 @@ jobs:
         token: ${{ secrets.GITHUB_TOKEN }}
 
     - name: Verify
-      run: swig-jse -version
+      run: |
+        swig-jse -version
+        swig-jse -javascript -napi -c++ test/example.i
+
+
+  binary:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v5
+    - uses: ./
+      with:
+        branch: jse
+        version: 5.0.8
+        verbose: true
+        token: ${{ secrets.GITHUB_TOKEN }}
+
+    - name: Verify
+      run: |
+        swig-jse -version
+        swig-jse -javascript -napi -c++ test/example.i
