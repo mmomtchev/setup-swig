@@ -3,9 +3,10 @@ import * as exec from '@actions/exec';
 import * as tc from '@actions/tool-cache';
 import * as cache from '@actions/cache';
 import { Octokit } from '@octokit/core';
-import * as os from 'os';
-import * as path from 'path';
-import * as fs from 'fs';
+import * as os from 'node:os';
+import * as path from 'node:path';
+import * as fs from 'node:fs';
+import { Readable } from 'node:stream';
 import * as tar from 'tar';
 
 const repos = {
@@ -85,19 +86,20 @@ async function binary() {
         }
       });
 
-      if (verbose) core.info('Uncompressing archive');
-
-      await new Promise<void>((resolve) => {
+      await (new Promise<void>((resolve, reject) => {
         const output = tar.extract({
           cwd: process.env.RUNNER_TOOL_CACHE!,
           onReadEntry: verbose ?
             (e) => {
               core.info(` - ${e.path}`);
-            } : undefined,
-          ondone: resolve
+            } : undefined
         });
-        output.write(Buffer.from(dist.data as unknown as ArrayBuffer));
-      });
+        output.on('close', resolve);
+        output.on('error', reject);
+        const tarData = Readable.from(Buffer.from(dist.data as unknown as ArrayBuffer));
+        tarData.pipe(output);
+        if (verbose) core.info('Uncompressing archive');
+      }));
 
       core.info(`Binary distribution of SWIG-${branch} ${release.name} successfully installed in ${swigRoot}`);
       const exePath = path.join(swigRoot, 'bin');
@@ -202,8 +204,10 @@ async function build() {
 async function run() {
   try {
     if (!alwaysBuild) {
-      if (await binary())
+      if (await binary()) {
+        core.info('Installed binary release');
         return;
+      }
     }
     await build();
   } catch (error) {
