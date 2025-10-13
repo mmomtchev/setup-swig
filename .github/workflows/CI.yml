@@ -164,5 +164,5 @@ jobs:
     - name: Verify
       run: |
         swig-jse -version
-        ./swig/bin/swig-jse -swiglib
-        ./swig/bin/swig-jse -javascript -napi -c++ test/example.i
+        /opt/hostedtoolcache/swig/bin/swig-jse -swiglib
+        /opt/hostedtoolcache/swig/bin/swig-jse -javascript -napi -c++ test/example.i
