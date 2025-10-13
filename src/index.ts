@@ -86,7 +86,13 @@ async function binary() {
       });
 
       if (verbose) core.info('Uncompressing archive');
-      const output = tar.extract({ cwd: process.env.RUNNER_TOOL_CACHE! });
+      const output = tar.extract({
+        cwd: process.env.RUNNER_TOOL_CACHE!,
+        onReadEntry: verbose ?
+          (e) => {
+            core.info(` - ${e.path}`);
+          } : undefined
+      });
       output.write(Buffer.from(dist.data as unknown as ArrayBuffer));
 
       core.info(`Binary distribution of SWIG-${branch} ${release.name} successfully installed in ${swigRoot}`);
