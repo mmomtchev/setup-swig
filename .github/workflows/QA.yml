@@ -76,8 +76,8 @@ jobs:
           test/example.h
     - name: Verify
       run: |
-        swig-jse -version
-        swig-jse -javascript -napi -c++ test/example.i
+        swig -version
+        swig -javascript -napi -c++ test/example.i
 
 
   jse:
