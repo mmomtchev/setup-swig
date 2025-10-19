@@ -25,9 +25,10 @@ jobs:
     - name: Install and transpile
       run: npm install
     - name: Update /dist
+      if: ${{ github.event_name != 'pull_request' }}
       uses: EndBug/add-and-commit@v9
       with:
-        add: 'dist'
+        add: 'dist src/git.json'
         message: 'Rebuild'
 
 
@@ -38,13 +39,18 @@ jobs:
         os: [ubuntu-latest]
         cache: [true, false]
     steps:
-    - uses: mmomtchev/setup-swig@main
+    - name: Checkout
+      uses: actions/checkout@v4
+    - name: setup-swig
+      uses: ./
       with:
         cache: ${{ matrix.cache }}
         verbose: true
 
     - name: Verify
-      run: swig -version
+      run: |
+        swig -version
+        swig -javascript -napi -c++ test/example.i
 
 
   version:
@@ -54,14 +60,19 @@ jobs:
         os: [ubuntu-latest]
         cache: [true, false]
     steps:
-    - uses: mmomtchev/setup-swig@main
+    - name: Checkout
+      uses: actions/checkout@v4
+    - name: setup-swig
+      uses: ./
       with:
         version: v4.1.0
         cache: ${{ matrix.cache }}
         verbose: true
 
     - name: Verify
-      run: swig -version
+      run: |
+        swig -version
+        swig -javascript -jsc -c++ test/example.i
 
 
   jse:
@@ -71,14 +82,19 @@ jobs:
         os: [ubuntu-latest]
         cache: [true, false]
     steps:
-    - uses: mmomtchev/setup-swig@main
+    - name: Checkout
+      uses: actions/checkout@v4
+    - name: setup-swig
+      uses: ./
       with:
         branch: jse
         cache: ${{ matrix.cache }}
         verbose: true
 
     - name: Verify
-      run: swig-jse -version
+      run: |
+        swig-jse -version
+        swig-jse -javascript -napi -c++ test/example.i
 
 
   jse-main:
@@ -88,7 +104,10 @@ jobs:
         os: [ubuntu-latest]
         cache: [true, false]
     steps:
-    - uses: mmomtchev/setup-swig@main
+    - name: Checkout
+      uses: actions/checkout@v4
+    - name: setup-swig
+      uses: ./
       with:
         branch: jse
         version: main
@@ -96,7 +115,9 @@ jobs:
         verbose: true
 
     - name: Verify
-      run: swig-jse -version
+      run: |
+        swig-jse -version
+        swig-jse -javascript -napi -c++ test/example.i
 
 
   auth:
@@ -107,8 +128,9 @@ jobs:
         cache: [true, false]
     steps:
     - name: Checkout
-      uses: actions/checkout@v5
-    - uses: mmomtchev/setup-swig@main
+      uses: actions/checkout@v4
+    - name: setup-swig
+      uses: ./
       with:
         branch: jse
         version: main
@@ -117,4 +139,30 @@ jobs:
         token: ${{ secrets.GITHUB_TOKEN }}
 
     - name: Verify
-      run: swig-jse -version
+      run: |
+        swig-jse -version
+        swig-jse -javascript -napi -c++ test/example.i
+
+
+  binary:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v4
+    - name: setup-swig
+      uses: ./
+      with:
+        branch: jse
+        version: 5.0.9
+        verbose: true
+        token: ${{ secrets.GITHUB_TOKEN }}
+
+    - name: Verify
+      run: |
+        swig-jse -version
+        swig-jse -swiglib
+        swig-jse -javascript -napi -c++ test/example.i
