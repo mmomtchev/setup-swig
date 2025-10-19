@@ -49,7 +49,7 @@ jobs:
     - name: Verify
       run: |
         swig -version
-        swig -javascript -jsc -c++ test/example.i
+        swig -javascript -napi -c++ test/example.i
 
 
   version:
@@ -71,7 +71,7 @@ jobs:
     - name: Verify
       run: |
         swig -version
-        swig -javascript -napi -c++ test/example.i
+        swig -javascript -jsc -c++ test/example.i
 
 
   jse:
