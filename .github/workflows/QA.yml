@@ -25,6 +25,7 @@ jobs:
     - name: Install and transpile
       run: npm install
     - name: Update /dist
+      if: ${{ github.event_name != 'pull_request' }}
       uses: EndBug/add-and-commit@v9
       with:
         add: 'dist'
