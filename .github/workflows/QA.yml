@@ -43,6 +43,12 @@ jobs:
         cache: ${{ matrix.cache }}
         verbose: true
 
+    - name: Checkout the test
+      uses: actions/checkout@v4
+      with:
+        sparse-checkout: |
+          test/example.i
+          test/example.h
     - name: Verify
       run: |
         swig -version
@@ -62,6 +68,12 @@ jobs:
         cache: ${{ matrix.cache }}
         verbose: true
 
+    - name: Checkout the test
+      uses: actions/checkout@v4
+      with:
+        sparse-checkout: |
+          test/example.i
+          test/example.h
     - name: Verify
       run: |
         swig-jse -version
@@ -81,6 +93,12 @@ jobs:
         cache: ${{ matrix.cache }}
         verbose: true
 
+    - name: Checkout the test
+      uses: actions/checkout@v4
+      with:
+        sparse-checkout: |
+          test/example.i
+          test/example.h
     - name: Verify
       run: |
         swig-jse -version
@@ -101,6 +119,12 @@ jobs:
         cache: ${{ matrix.cache }}
         verbose: true
 
+    - name: Checkout the test
+      uses: actions/checkout@v4
+      with:
+        sparse-checkout: |
+          test/example.i
+          test/example.h
     - name: Verify
       run: |
         swig-jse -version
@@ -114,8 +138,6 @@ jobs:
         os: [ubuntu-latest]
         cache: [true, false]
     steps:
-    - name: Checkout
-      uses: actions/checkout@v5
     - uses: mmomtchev/setup-swig@main
       with:
         branch: jse
@@ -124,6 +146,12 @@ jobs:
         verbose: true
         token: ${{ secrets.GITHUB_TOKEN }}
 
+    - name: Checkout the test
+      uses: actions/checkout@v4
+      with:
+        sparse-checkout: |
+          test/example.i
+          test/example.h
     - name: Verify
       run: |
         swig-jse -version
@@ -137,8 +165,6 @@ jobs:
       matrix:
         os: [ubuntu-latest, macos-latest, windows-latest]
     steps:
-    - name: Checkout
-      uses: actions/checkout@v5
     - uses: mmomtchev/setup-swig@main
       with:
         branch: jse
@@ -146,6 +172,12 @@ jobs:
         verbose: true
         token: ${{ secrets.GITHUB_TOKEN }}
 
+    - name: Checkout the test
+      uses: actions/checkout@v4
+      with:
+        sparse-checkout: |
+          test/example.i
+          test/example.h
     - name: Verify
       run: |
         swig-jse -version
