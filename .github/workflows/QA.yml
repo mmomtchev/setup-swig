@@ -142,7 +142,7 @@ jobs:
       uses: ./
       with:
         branch: jse
-        version: 5.0.8
+        version: 5.0.9
         verbose: true
         token: ${{ secrets.GITHUB_TOKEN }}
 

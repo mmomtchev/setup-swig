@@ -157,12 +157,12 @@ jobs:
       uses: ./
       with:
         branch: jse
-        version: 5.0.8
+        version: 5.0.9
         verbose: true
         token: ${{ secrets.GITHUB_TOKEN }}
 
     - name: Verify
       run: |
         swig-jse -version
-        /opt/hostedtoolcache/swig/bin/swig-jse -swiglib
-        /opt/hostedtoolcache/swig/bin/swig-jse -javascript -napi -c++ test/example.i
+        swig-jse -swiglib
+        swig-jse -javascript -napi -c++ test/example.i
