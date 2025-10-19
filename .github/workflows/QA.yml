@@ -139,8 +139,7 @@ jobs:
     steps:
     - name: Checkout
       uses: actions/checkout@v5
-    - name: setup-swig
-      uses: ./
+    - uses: mmomtchev/setup-swig@main
       with:
         branch: jse
         version: 5.0.9
