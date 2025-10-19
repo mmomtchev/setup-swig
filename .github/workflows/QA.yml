@@ -133,6 +133,7 @@ jobs:
   binary:
     runs-on: ${{ matrix.os }}
     strategy:
+      fail-fast: false
       matrix:
         os: [ubuntu-latest, macos-latest, windows-latest]
     steps:
@@ -149,4 +150,5 @@ jobs:
     - name: Verify
       run: |
         swig-jse -version
+        swig-jse -swiglib
         swig-jse -javascript -napi -c++ test/example.i
