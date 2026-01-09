@@ -4,7 +4,7 @@ This actions step downloads and installs a version of SWIG.
 
 It supports Linux, Windows and macOS runners when installing a precompiled binary distribution of SWIG JSE.
 
-It also supports rebuilding any version of SWIG on Linux runners only.
+It also supports rebuilding any version of SWIG on Linux and macOS runners.
 
 You can check the [`magickwand.js` workflows](https://github.com/mmomtchev/magickwand.js/tree/main/.github/workflows) for an example of a complex project that uses it.
 
