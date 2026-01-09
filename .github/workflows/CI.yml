@@ -30,7 +30,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-latest]
+        os: [ubuntu-latest, macos-latest]
         cache: [true, false]
     steps:
     - name: Checkout
@@ -40,6 +40,7 @@ jobs:
       with:
         cache: ${{ matrix.cache }}
         verbose: true
+        token: ${{ secrets.GITHUB_TOKEN }}
 
     - name: Verify
       run: |
@@ -53,7 +54,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-latest]
+        os: [ubuntu-latest, macos-latest]
         cache: [true, false]
     steps:
     - name: Checkout
@@ -64,6 +65,7 @@ jobs:
         version: v4.1.0
         cache: ${{ matrix.cache }}
         verbose: true
+        token: ${{ secrets.GITHUB_TOKEN }}
 
     - name: Verify
       run: swig -version
@@ -75,7 +77,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-latest]
+        os: [ubuntu-latest, macos-latest]
         cache: [true, false]
     steps:
     - name: Checkout
@@ -87,6 +89,7 @@ jobs:
         cache: ${{ matrix.cache }}
         verbose: true
         build: true
+        token: ${{ secrets.GITHUB_TOKEN }}
 
     - name: Verify
       run: |
@@ -100,7 +103,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-latest]
+        os: [ubuntu-latest, macos-latest]
         cache: [true, false]
     steps:
     - name: Checkout
@@ -112,6 +115,7 @@ jobs:
         version: main
         cache: ${{ matrix.cache }}
         verbose: true
+        token: ${{ secrets.GITHUB_TOKEN }}
 
     - name: Verify
       run: |
@@ -125,7 +129,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-latest]
+        os: [ubuntu-latest, macos-latest]
         cache: [true, false]
     steps:
     - name: Checkout

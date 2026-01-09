@@ -119,13 +119,33 @@ async function binary() {
 }
 
 async function build() {
-  if (os.platform() !== 'linux') {
-    throw new Error('Rebuilding from source is supported only on Linux runners at the moment');
+  const platform = os.platform();
+  if (platform !== 'linux' && platform !== 'darwin') {
+    throw new Error('Rebuilding from source is supported only on Linux and macOS runners at the moment');
   }
 
   if (!repos[branch]) throw new Error('Invalid branch');
 
   if (verbose) core.info(`Building from source SWIG-${branch}-${version}`);
+
+  // Install build dependencies on macOS
+  if (platform === 'darwin') {
+    core.info('Installing build dependencies on macOS...');
+    try {
+      await exec.exec('brew', ['install', 'autoconf', 'automake', 'pcre2', 'bison']);
+      // Add Homebrew bison to PATH (macOS built-in bison is too old)
+      const bisonPath = '/opt/homebrew/opt/bison/bin';
+      const bisonPathIntel = '/usr/local/opt/bison/bin';
+      if (fs.existsSync(bisonPath)) {
+        process.env.PATH = bisonPath + path.delimiter + process.env.PATH;
+      } else if (fs.existsSync(bisonPathIntel)) {
+        process.env.PATH = bisonPathIntel + path.delimiter + process.env.PATH;
+      }
+      if (verbose) core.info(`PATH after adding bison: ${process.env.PATH}`);
+    } catch (e) {
+      core.warning(`Failed to install some dependencies: ${e.message}`);
+    }
+  }
 
   const tags = (await octokit.request('GET /repos/{owner}/{repo}/tags', {
     owner: repos[branch].owner,
