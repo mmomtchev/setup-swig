@@ -24,7 +24,7 @@
   "license": "ISC",
   "devDependencies": {
     "@actions/cache": "^5.0.2",
-    "@actions/core": "^2.0.1",
+    "@actions/core": "^2.0.2",
     "@actions/exec": "^2.0.0",
     "@actions/io": "^2.0.0",
     "@actions/tool-cache": "^3.0.0",
