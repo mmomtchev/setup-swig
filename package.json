@@ -4,6 +4,7 @@
   "private": true,
   "description": "GitHub action to download and setup SWIG",
   "main": "dist/index.js",
+  "type": "module",
   "scripts": {
     "prepare": "git log -1 --pretty='format:{ \"git\": \"%h\" }' > src/git.json && npx ncc build src/index.ts -m -o dist",
     "test:jse:build:latest": "rm -rf install && mkdir -p install/tmp && RUNNER_TEMP=install/tmp RUNNER_TOOL_CACHE=install INPUT_BUILD=true INPUT_VERSION=latest INPUT_BRANCH=jse INPUT_CACHE=false INPUT_VERBOSE=true node dist/index.js && install/swig/swig-jse -version",
