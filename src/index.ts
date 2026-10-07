@@ -10,10 +10,10 @@ import { Readable } from 'node:stream';
 import * as tar from 'tar';
 
 function validateBranch(branchInput: string): keyof typeof repos {
-  if (branchInput in Object.keys(repos)) {
+  if (branchInput in repos) {
     return branchInput as keyof typeof repos;
   }
-  throw new Error('The supported repos are ' + Object.keys(repos).join(', '));
+  throw new Error(`Unsupported repo "${branchInput}", the supported repos are ${Object.keys(repos).join(', ')}`);
 }
 
 const repos = {
@@ -180,7 +180,7 @@ async function build() {
       tag = {
         name: version,
         tarball_url: `https://github.com/${repos[branch].owner}/${repos[branch].repo}/archive/${version}.tar.gz`
-      }
+      };
     }
   }
 
