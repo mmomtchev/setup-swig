@@ -3,6 +3,10 @@
     "module": "nodenext",
     "target": "es2020",
     "outDir": "build",
+    "strict": true,
+    "strictNullChecks": true,
+    "skipLibCheck": true,
+    "rootDir": "./src",
     "moduleResolution": "nodenext"
   },
   "include": [ "./src" ]

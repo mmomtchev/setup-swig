@@ -9,17 +9,24 @@ import * as fs from 'node:fs';
 import { Readable } from 'node:stream';
 import * as tar from 'tar';
 
+function validateBranch(branchInput: string): keyof typeof repos {
+  if (branchInput in repos) {
+    return branchInput as keyof typeof repos;
+  }
+  throw new Error(`Unsupported repo "${branchInput}", the supported repos are ${Object.keys(repos).join(', ')}`);
+}
+
 const repos = {
   main: { owner: 'swig', repo: 'swig' },
   jse: { owner: 'mmomtchev', repo: 'swig' }
 };
 
-let token: string = undefined;
+let token: string | undefined = undefined;
 const inputToken = core.getInput('token', { required: false });
 const envToken = process.env.GITHUB_TOKEN;
 
 const verbose = core.getBooleanInput('verbose', { required: false });
-const branch = core.getInput('branch', { required: false });
+const branch = validateBranch(core.getInput('branch', { required: false }));
 const version = core.getInput('version', { required: false });
 const shouldCache = core.getBooleanInput('cache', { required: false });
 const alwaysBuild = core.getBooleanInput('build', { required: false });
@@ -53,14 +60,16 @@ async function binary() {
       }
     })).data;
 
-    let release: typeof releases[0] = null;
+    let release: typeof releases[0] | undefined;
 
     if (version === 'latest') {
       releases.sort((b, a) => Date.parse(a.created_at) - Date.parse(b.created_at));
       release = releases[0];
-    } else if (releases.find((t) => t.tag_name === version || t.tag_name === `v${version}`)) {
-      release = releases.find((t) => t.tag_name === version || t.tag_name === `v${version}`);
     } else {
+      release = releases.find((t) => t.tag_name === version || t.tag_name === `v${version}`);
+    }
+
+    if (!release) {
       core.warning(`Cannot find release for tag ${version}`);
       return false;
     }
@@ -112,8 +121,9 @@ async function binary() {
     }
 
     return true;
-  } catch (e) {
-    core.error(e.message);
+  } catch (e: any) {
+    if (e instanceof Error) core.error(e.message);
+    else core.error(e.toString());
     return false;
   }
 }
@@ -142,8 +152,8 @@ async function build() {
         process.env.PATH = bisonPathIntel + path.delimiter + process.env.PATH;
       }
       if (verbose) core.info(`PATH after adding bison: ${process.env.PATH}`);
-    } catch (e) {
-      core.warning(`Failed to install some dependencies: ${e.message}`);
+    } catch (e: any) {
+      core.warning(`Failed to install some dependencies: ${e instanceof Error ? e.message : e.toString()}`);
     }
   }
 
@@ -162,13 +172,16 @@ async function build() {
   };
   if (version === 'latest') {
     tag = tags[0];
-  } else if (tags.find((t) => t.name === version || t.name == `v${version}`)) {
-    tag = tags.find((t) => t.name === version || t.name == `v${version}`);
   } else {
-    tag = {
-      name: version,
-      tarball_url: `https://github.com/${repos[branch].owner}/${repos[branch].repo}/archive/${version}.tar.gz`
-    };
+    const found = tags.find((t) => t.name === version || t.name == `v${version}`);
+    if (found)
+      tag = found;
+    else {
+      tag = {
+        name: version,
+        tarball_url: `https://github.com/${repos[branch].owner}/${repos[branch].repo}/archive/${version}.tar.gz`
+      };
+    }
   }
 
   let cached = false;
@@ -206,9 +219,9 @@ async function build() {
       try {
         await cache.saveCache([swigRoot], cacheKey);
         core.info(`Saved to cache ${cacheKey}`);
-      } catch (e) {
+      } catch (e: any) {
         core.notice(`Failed saving SWIG to cache with key ${cacheKey}, ` +
-          `Github API responded "${e.message}, ` +
+          `Github API responded "${e instanceof Error ? e.message : e.toString()}, ` +
           'next install will rebuild from source, ' +
           'if this happens intermittently, it may be a temporary Github problem or ' +
           'a conflict between concurrent install jobs.');
