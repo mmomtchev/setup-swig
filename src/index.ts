@@ -60,19 +60,18 @@ async function binary() {
       }
     })).data;
 
-    let release: typeof releases[0];
+    let release: typeof releases[0] | undefined;
 
     if (version === 'latest') {
       releases.sort((b, a) => Date.parse(a.created_at) - Date.parse(b.created_at));
       release = releases[0];
     } else {
-      const found = releases.find((t) => t.tag_name === version || t.tag_name === `v${version}`);
-      if (found) {
-        release = found;
-      } else {
-        core.warning(`Cannot find release for tag ${version}`);
-        return false;
-      }
+      release = releases.find((t) => t.tag_name === version || t.tag_name === `v${version}`);
+    }
+
+    if (!release) {
+      core.warning(`Cannot find release for tag ${version}`);
+      return false;
     }
 
     if (release.assets.length > 0) {
